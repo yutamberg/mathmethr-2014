@@ -1,0 +1,88 @@
+---
+output: html_document
+---
+# Пример текста решения домашнего задания
+
+## Анализ мощности, домашнее задание, вариант 0
+
+М.А. Варфоломеева
+
+### Введение
+
+Экспериментальные исследования эффективности различных препаратов и вакцин с использованием животных [1] - важная стадия, предшествующая настоящим клиническим испытаниям на людях[2]. Большинство научных журналов предъявляет специальные требования к исследованиям, где используются животные [3, 4, 5]. В частности, в тех случаях, когда животных нельзя заменить другими объектами, требуют по возможности уменьшить число использованных особей. В результате возникает опасность снижения мощности статистических тестов из-за снижения объема выборки. Избежать этих сложностей позволяет анализ мощности [6].
+В этой работе для оптимизации эксперимента по исследованию эффективности вакцины мы рассчитаем объемы выборок, необходимые для обнаружения сильного эффекта при помощи t-критерия.
+
+### Методы
+
+Количество животных, необходимое в контроле для обнаружения эффекта от использования вакцины с вероятностью 0.8, определили при помощи анализа мощности [6, 7] при двух уровнях значимости (0.01 и 0.05) и при объеме выборки  в опыте 28. В качестве оценки величины сильного эффекта для t-критерия использовали уровень 0.8, предложенный Я.Коэном [7]. Расчеты проведены в R [8, 9] с использованием пакета pwr [10].
+
+### Рассчеты
+
+```{r}
+# Внимание, не обязательно комментировать все подряд (здесь я это сделала, чтобы вам было легче прочесть код). Но основные шаги лучше откомментировать (здесь отмечены двойным знаком решетки ##) 
+
+## Исходные данные
+n1 <- 28
+power <- 0.8
+alpha1 <- 0.01
+alpha2 <- 0.05
+
+library(pwr)
+
+## Рассчитываем величину сильного эффекта по Коэну 
+effect_calculation <- cohen.ES(test = "t", size = "large")
+# Добываем и округляем величину сильного эффекта по Коэну
+effect <- abs(effect_calculation$effect.size)
+
+## Рассчитываем объем выборки при уровне значимости alpha1
+n_alpha1 <- pwr.t2n.test(n1 = n1, n2 = NULL, d = effect, power = power, sig.level = alpha1, alternative = "two.sided")
+# Где в n_alpha1 объем выборки? Посмотрим структуру
+str(n_alpha1) # объем выборки в элементе $n2
+# Добываем и округляем объем выборки
+n_alpha1 <- ceiling(n_alpha1$n2)
+
+## Рассчитываем величину эффекта при уровне значимости alpha2
+n_alpha2 <- pwr.t2n.test(n1 = n1, n2 = NULL, d = effect, power = power, sig.level = alpha2, alternative = "two.sided")
+# Добываем и округляем объем выборки
+n_alpha2 <- ceiling(n_alpha2$n2)
+
+# Цитируем R
+citation()
+# Как цитировать RStudio смотрим здесь
+# https://support.rstudio.com/hc/communities/public/questions/200658933-How-to-cite-RStudio
+# Цитируем pwr
+citation("pwr")
+```
+
+
+### Результаты и обсуждение
+
+Оказалось, что если в опыте `r n1` животных, то для достижения мощности теста 80% в контроле нужно использовать `r n_alpha1` при &alpha; = `r alpha1`. Если уровень значимости увеличить до &alpha; = `r alpha2`, то животных потребуется меньше (всего `r n_alpha2`).
+
+### Вывод
+
+Применение анализа мощности _a priory_ позволило рассчитать оптимальный объем выборки для обнаружения сильного эффекта. При увеличении критического уровня значимости при статистических тестах до &alpha; = `r alpha2` число животных, использованных в эксперименте будет минимально. При написании раздела Ethic statement в будущей статье результаты априорного анализа мощности можно будет привести в качестве аргумента, чтобы объяснить почему в экспериментах нужно было использовать именно столько животных. 
+
+
+### Список литературы
+
+[1] Animal testing. (2014, September 15). In Wikipedia, The Free Encyclopedia. Retrieved 10:32, September 20, 2014, from http://en.wikipedia.org/w/index.php?title=Animal_testing&oldid=625690887
+
+[2] Clinical trial. (2014, September 16). In Wikipedia, The Free Encyclopedia. Retrieved 10:29, September 20, 2014, from http://en.wikipedia.org/w/index.php?title=Clinical_trial&oldid=625838010
+
+[3] Guide for authors | Journal of Microbiology, Immunology and Infection | 1684-1182 | Elsevier. (n.d.). Retrieved September 20, 2014, from http://www.elsevier.com/journals/journal-of-microbiology-immunology-and-infection/1684-1182/guide-for-authors
+
+[4] Before you start. (n.d.). Retrieved September 20, 2014, from https://www.springer.com/gp/authors-editors/journal-author/journal-author-helpdesk/before-you-start
+
+[5] PLOS ONE: accelerating the publication of peer-reviewed science. (n.d.). Retrieved September 20, 2014, from http://www.plosone.org/static/policies.action#animal
+
+[6]. Quinn, G. G. P., & Keough, M. J. (2002). Experimental design and data analysis for biologists. Cambridge University Press.
+
+[7]. Cohen, J. (1988). Statistical power analysis for the behavioral sciences (2nd ed.). Hillsdale,NJ: Lawrence Erlbaum.
+
+[8]. R Core Team. (2013). R: A language and environment for statistical computing. R Foundation for Statistical Computing, Vienna, Austria. URL http://www.R-project.org/.
+
+[9]. RStudio (2012). RStudio: Integrated development environment for R (Version 0.96.122). Boston, MA. URL http://www.rstudio.org/
+
+[10]. Champely, S. (2012). pwr: Basic functions for power analysis. R
+  package version 1.1.1. URL http://CRAN.R-project.org/package=pwr
