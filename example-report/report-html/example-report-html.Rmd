@@ -3,6 +3,21 @@ output: html_document
 ---
 # Пример текста решения домашнего задания
 
+```{r, setup, include=FALSE}
+##### Это код настроек #####
+# output options
+options(width = 70, scipen = 6, digits = 3) 
+# to render cyrillics in plots use cairo pdf
+options(device = function(file, width = 7, height = 7, ...) {
+  cairo_pdf(tempfile(), width = width, height = height, ...)
+  })
+library(knitr)
+# chunk default options
+opts_chunk$set(tidy = FALSE,   # save manual code formatting
+               fig.width = 5,  # default figure width
+               fig.height = 4) # default figure height
+```
+
 ## Анализ мощности, домашнее задание, вариант 0
 
 М.А. Варфоломеева
